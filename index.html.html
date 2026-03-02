@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Los Santos Medical Service | EMS</title>
+  <meta name="description" content="Los Santos Medical Service (LSMS) – Emergency Medical Services. Majitel: Jacob Sanchez." />
+  <style>
+    /* ---------- Design tokens ---------- */
+    :root{
+      --bg0:#070A12;
+      --bg1:#0B1220;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.10);
+      --text:#E9EEF8;
+      --muted:#A9B4C7;
+      --brand:#E11D48;   /* EMS red */
+      --brand2:#38BDF8;  /* medical blue accent */
+      --ok:#22C55E;
+      --shadow: 0 24px 60px rgba(0,0,0,.45);
+      --radius: 18px;
+      --radius2: 28px;
+      --max: 1120px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    /* ---------- Base ---------- */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(56,189,248,.18), transparent 60%),
+        radial-gradient(900px 500px at 90% 10%, rgba(225,29,72,.20), transparent 55%),
+        radial-gradient(800px 500px at 40% 120%, rgba(34,197,94,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 55%, #070A12);
+      overflow-x:hidden;
+    }
+    a{color:inherit}
+    .container{max-width:var(--max); margin:0 auto; padding:0 20px}
+    .blur{
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    /* ---------- Header / Nav ---------- */
+    header{
+      position:sticky; top:0; z-index:50;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      background: rgba(7,10,18,.55);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; text-decoration:none;
+      font-weight:700; letter-spacing:.2px;
+    }
+    .logo{
+      width:36px;height:36px;border-radius:12px;
+      background: linear-gradient(135deg, rgba(225,29,72,1), rgba(56,189,248,1));
+      box-shadow: 0 12px 30px rgba(225,29,72,.20);
+      display:grid; place-items:center;
+    }
+    .logo svg{filter: drop-shadow(0 10px 18px rgba(0,0,0,.25));}
+    .navlinks{display:flex; gap:18px; align-items:center}
+    .navlinks a{
+      text-decoration:none; color:var(--muted);
+      font-weight:600; font-size:14px; padding:10px 10px; border-radius:12px;
+      transition: .18s ease;
+    }
+    .navlinks a:hover{color:var(--text); background: rgba(255,255,255,.06)}
+    .cta{
+      display:flex; gap:10px; align-items:center;
+    }
+    .btn{
+      text-decoration:none;
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 14px;
+      border-radius:14px;
+      font-weight:700; font-size:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      transition: .18s ease;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.09)}
+    .btn.primary{
+      border-color: rgba(225,29,72,.55);
+      background: linear-gradient(135deg, rgba(225,29,72,.95), rgba(225,29,72,.65));
+      box-shadow: 0 18px 40px rgba(225,29,72,.20);
+    }
+    .btn.primary:hover{filter:saturate(1.05) brightness(1.03)}
+    .pill{
+      font-family:var(--mono);
+      font-size:12px;
+      color: rgba(56,189,248,.95);
+      border:1px solid rgba(56,189,248,.25);
+      background: rgba(56,189,248,.06);
+      padding:6px 10px; border-radius:999px;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero{padding:64px 0 28px}
+    .hero-grid{
+      display:grid; gap:26px;
+      grid-template-columns: 1.25fr .75fr;
+      align-items:stretch;
+    }
+    .headline{
+      font-size: clamp(36px, 4.2vw, 54px);
+      line-height:1.03;
+      margin:14px 0 10px;
+      letter-spacing:-.6px;
+    }
+    .sub{
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.55;
+      max-width: 64ch;
+    }
+    .hero-card{
+      border:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .hero-card:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(900px 300px at 20% 10%, rgba(56,189,248,.25), transparent 60%),
+                  radial-gradient(700px 280px at 80% 30%, rgba(225,29,72,.25), transparent 55%);
+      opacity:.6;
+      pointer-events:none;
+    }
+    .hero-card-inner{position:relative; padding:18px}
+    .statrow{
+      display:grid; grid-template-columns:1fr 1fr 1fr;
+      gap:12px; margin-top:18px;
+    }
+    .stat{
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.12);
+      border-radius:16px;
+      padding:14px 14px;
+      min-height:76px;
+    }
+    .stat b{display:block; font-size:18px}
+    .stat span{color:var(--muted); font-size:12px}
+    .owner{
+      display:flex; gap:14px; align-items:center;
+      padding:14px; border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+      margin-top:14px;
+    }
+    .avatar{
+      width:54px; height:54px; border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(56,189,248,.35), transparent 55%),
+        radial-gradient(circle at 70% 70%, rgba(225,29,72,.35), transparent 55%),
+        rgba(255,255,255,.05);
+      display:grid; place-items:center;
+      overflow:hidden;
+    }
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .owner small{display:block; color:var(--muted); margin-top:2px}
+    .owner .name{font-weight:800}
+    .tagrow{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px}
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      font-size:12px;
+      font-weight:700;
+    }
+    .tag svg{opacity:.9}
+    .hero-actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:18px}
+    .divider{
+      height:1px; background: rgba(255,255,255,.08);
+      margin:22px 0 0;
+    }
+
+    /* ---------- Sections ---------- */
+    section{padding:36px 0}
+    .section-title{
+      display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
+      margin-bottom:14px;
+    }
+    h2{
+      margin:0;
+      font-size:22px;
+      letter-spacing:-.2px;
+    }
+    .hint{color:var(--muted); font-size:13px; line-height:1.4}
+    .grid3{
+      display:grid; gap:14px;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .card{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      border-radius: var(--radius);
+      padding:16px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.20);
+    }
+    .card:hover{border-color: rgba(255,255,255,.16)}
+    .card .icon{
+      width:44px;height:44px;border-radius:16px;
+      display:grid;place-items:center;
+      background: rgba(225,29,72,.12);
+      border:1px solid rgba(225,29,72,.22);
+    }
+    .card.blue .icon{background: rgba(56,189,248,.12); border-color: rgba(56,189,248,.22)}
+    .card.green .icon{background: rgba(34,197,94,.10); border-color: rgba(34,197,94,.18)}
+    .card h3{margin:12px 0 6px; font-size:16px}
+    .card p{margin:0; color:var(--muted); font-size:13.5px; line-height:1.55}
+
+    .split{
+      display:grid; gap:16px;
+      grid-template-columns: 1fr 1fr;
+      align-items:start;
+    }
+    .list{
+      margin:10px 0 0; padding:0; list-style:none;
+      display:grid; gap:10px;
+    }
+    .li{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:12px; border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.10);
+    }
+    .li b{display:block; font-size:13.5px}
+    .li span{display:block; color:var(--muted); font-size:12.5px; margin-top:2px; line-height:1.45}
+    .check{
+      width:22px; height:22px; border-radius:8px;
+      background: rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.22);
+      display:grid; place-items:center; flex:0 0 auto;
+      margin-top:1px;
+    }
+
+    /* ---------- Photo block ---------- */
+    .photo{
+      position:relative;
+      border:1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--radius);
+      padding:16px;
+      overflow:hidden;
+    }
+    .photo .frame{
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(500px 220px at 20% 10%, rgba(56,189,248,.25), transparent 60%),
+        radial-gradient(420px 200px at 85% 40%, rgba(225,29,72,.25), transparent 60%),
+        rgba(0,0,0,.18);
+      height: 260px;
+      display:grid; place-items:center;
+      overflow:hidden;
+    }
+    .photo img{
+      width:100%; height:100%; object-fit:cover; display:none;
+    }
+    .photo .placeholder{
+      text-align:center; padding:10px 16px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+      max-width: 44ch;
+    }
+    .kbd{
+      display:inline-block;
+      font-family:var(--mono);
+      font-size:12px;
+      padding:2px 8px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.20);
+      color: rgba(233,238,248,.92);
+    }
+
+    /* ---------- Footer ---------- */
+    footer{
+      padding:30px 0 42px;
+      border-top:1px solid rgba(255,255,255,.06);
+      color:var(--muted);
+      font-size:13px;
+    }
+    .foot{
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
+      flex-wrap:wrap;
+    }
+    .foot a{color:var(--muted); text-decoration:none}
+    .foot a:hover{color:var(--text)}
+
+    /* ---------- Mobile ---------- */
+    @media (max-width: 980px){
+      .hero-grid{grid-template-columns: 1fr}
+      .statrow{grid-template-columns:1fr 1fr}
+      .grid3{grid-template-columns: 1fr}
+      .split{grid-template-columns: 1fr}
+      .navlinks{display:none}
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="blur">
+  <div class="container">
+    <div class="nav">
+      <a class="brand" href="#top" aria-label="Los Santos Medical Service">
+        <div class="logo" aria-hidden="true">
+          <!-- EMS cross -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M10 2h4v8h8v4h-8v8h-4v-8H2v-4h8V2z" fill="white" opacity=".92"/>
+          </svg>
+        </div>
+        <div>
+          Los Santos Medical Service
+          <div class="pill" style="display:inline-block;margin-left:10px;">EMS • EMS</div>
+        </div>
+      </a>
+
+      <div class="navlinks">
+        <a href="#about">O nás</a>
+        <a href="#services">Služby</a>
+        <a href="#structure">Struktura</a>
+        <a href="#recruitment">Nábor</a>
+        <a href="#contact">Kontakt</a>
+      </div>
+
+      <div class="cta">
+        <a class="btn" href="#contact" title="Kontakt">Kontakt</a>
+        <a class="btn primary" href="#dispatch" title="Tísňová linka">
+          <span aria-hidden="true">🚨</span> 911 / EMS Dispatch
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <div class="container hero">
+    <div class="hero-grid">
+      <div>
+        <div class="pill">Oficiální EMS jednotka pro Los Santos</div>
+        <h1 class="headline">Rychlá, profesionální a realistická zdravotnická péče v RP.</h1>
+        <p class="sub">
+          <b>LSMS</b> zajišťuje výjezdy, ošetření a transport pacientů po celém Los Santos a Blaine County.
+          Důraz klademe na disciplínu, komunikaci a kvalitní roleplay.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn primary" href="#recruitment">Přidat se do LSMS</a>
+          <a class="btn" href="#services">Zobrazit služby</a>
+          <a class="btn" href="#protocols">Postupy & protokoly</a>
+        </div>
+
+        <div class="tagrow">
+          <div class="tag">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 2l9 4v6c0 5-3.8 9.7-9 10-5.2-.3-9-5-9-10V6l9-4z" stroke="currentColor" opacity=".9"/>
+            </svg>
+            24/7 readiness
+          </div>
+          <div class="tag">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 12h16M12 4v16" stroke="currentColor" opacity=".9"/>
+            </svg>
+            Trauma & transport
+          </div>
+          <div class="tag">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 20h18M6 20V9l6-5 6 5v11" stroke="currentColor" opacity=".9"/>
+            </svg>
+            Pillbox Hospital
+          </div>
+        </div>
+
+        <div class="divider"></div>
+      </div>
+
+      <aside class="hero-card blur">
+        <div class="hero-card-inner">
+          <div class="pill">Vedení organizace</div>
+
+          <div class="owner">
+            <div class="avatar" title="Fotka majitele">
+              <img src="owner.jpg" alt="Jacob Sanchez" onerror="this.style.display='none'">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z" fill="rgba(233,238,248,.85)"/>
+              </svg>
+            </div>
+            <div>
+              <div class="name">Jacob Sanchez</div>
+              <small>Owner • Director of EMS</small>
+            </div>
+          </div>
+
+          <div class="statrow">
+            <div class="stat">
+              <b>LSMS</b>
+              <span>Los Santos Medical Service</span>
+            </div>
+            <div class="stat">
+              <b>EMS</b>
+              <span>Emergency Response</span>
+            </div>
+            <div class="stat">
+              <b>RP</b>
+              <span>Realistic protocols</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div id="dispatch" class="card" style="margin-top:14px;background:rgba(225,29,72,.08);border-color:rgba(225,29,72,.20)">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+              <div>
+                <div style="font-weight:900;letter-spacing:.2px;">Tísňová linka</div>
+                <div class="hint" style="margin-top:4px;">Pro urgentní případy volej <b>911</b> a požádej o EMS.</div>
+              </div>
+              <div style="font-size:26px;opacity:.95" aria-hidden="true">🚑</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <section id="about">
+    <div class="container">
+      <div class="section-title">
+        <h2>O nás</h2>
+        <div class="hint">Kdo jsme a jak fungujeme v rámci FiveM roleplay.</div>
+      </div>
+
+      <div class="split">
+        <div class="card">
+          <div class="icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2l9 4v6c0 5-3.8 9.7-9 10-5.2-.3-9-5-9-10V6l9-4z" stroke="white" opacity=".9"/>
+              <path d="M12 7v10M7 12h10" stroke="white" opacity=".9"/>
+            </svg>
+          </div>
+          <h3>Profesionalita a disciplína</h3>
+          <p>
+            LSMS drží jednotné standardy, chain of command a čistou komunikaci.
+            Cíl: kvalitní RP, ne chaos.
+          </p>
+
+          <ul class="list">
+            <li class="li">
+              <div class="check" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6 9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div><b>24/7 Preparedness</b><span>Vždy připraveni k výjezdu, podle aktivity serveru.</span></div>
+            </li>
+            <li class="li">
+              <div class="check" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6 9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div><b>Realistic approach</b><span>Protokoly, dokumentace zásahů a konzistentní postupy.</span></div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="photo">
+          <div class="frame">
+            <img id="yourPhoto" src="your-photo.jpg" alt="Fotka pro LSMS" onerror="this.style.display='none'">
+            <div class="placeholder" id="photoPlaceholder">
+              Sem si dej svoji fotku.<br><br>
+              Vlož soubor do stejné složky jako tento web a pojmenuj ho
+              <span class="kbd">your-photo.jpg</span>.
+            </div>
+          </div>
+          <div class="hint" style="margin-top:10px;">
+            Tip: může to být fotka postavy, týmová fotka, nebo banner z nemocnice.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="container">
+      <div class="section-title">
+        <h2>Naše služby</h2>
+        <div class="hint">Co LSMS běžně zajišťuje v terénu.</div>
+      </div>
+
+      <div class="grid3">
+        <div class="card">
+          <div class="icon" aria-hidden="true">🚨</div>
+          <h3>Emergency Response</h3>
+          <p>Rychlý výjezd k dopravním nehodám, zraněním a urgentním situacím.</p>
+        </div>
+        <div class="card blue">
+          <div class="icon" aria-hidden="true">🩺</div>
+          <h3>Medical Treatment</h3>
+          <p>Primární vyšetření, stabilizace pacienta a základní ošetření na místě.</p>
+        </div>
+        <div class="card green">
+          <div class="icon" aria-hidden="true">🏥</div>
+          <h3>Hospital Transfer</h3>
+          <p>Bezpečný transport do nemocnice a předání pacienta do další péče.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="protocols">
+    <div class="container">
+      <div class="section-title">
+        <h2>Postupy & protokoly</h2>
+        <div class="hint">Jednoduchý standard, aby každý zásah vypadal profesionálně.</div>
+      </div>
+
+      <div class="split">
+        <div class="card">
+          <h3 style="margin-top:0">Standardní postup zásahu</h3>
+          <ol style="margin:10px 0 0;color:var(--muted);line-height:1.7">
+            <li>Přijetí hlášení & potvrzení výjezdu</li>
+            <li>Zajištění bezpečí místa zásahu</li>
+            <li>Primární vyšetření a stabilizace</li>
+            <li>Komunikace s ostatními složkami</li>
+            <li>Transport & předání pacienta</li>
+            <li>Zápis / report zásahu</li>
+          </ol>
+        </div>
+
+        <div class="card" style="border-color:rgba(56,189,248,.18)">
+          <h3 style="margin-top:0">Povinnosti člena LSMS</h3>
+          <ul class="list">
+            <li class="li">
+              <div class="check" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6 9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div><b>Chain of Command</b><span>Respektuj vedení, role a rozhodnutí nadřízených.</span></div>
+            </li>
+            <li class="li">
+              <div class="check" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6 9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div><b>Profesionalita</b><span>Klidná komunikace, žádný trolling, žádné OOC drama.</span></div>
+            </li>
+            <li class="li">
+              <div class="check" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6 9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div><b>Dokumentace</b><span>Každý zásah se dá dohledat a zkontrolovat.</span></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="structure">
+    <div class="container">
+      <div class="section-title">
+        <h2>Organizační struktura</h2>
+        <div class="hint">Jednoduchá hierarchie pro čisté fungování.</div>
+      </div>
+
+      <div class="card" style="padding:0; overflow:hidden">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid rgba(255,255,255,.06)">
+          <div style="padding:16px;border-right:1px solid rgba(255,255,255,.06)">
+            <div class="pill">Command</div>
+            <div style="margin-top:10px;color:var(--muted);line-height:1.9">
+              <div><b style="color:var(--text)">Director</b> — Jacob Sanchez</div>
+              <div><b style="color:var(--text)">Deputy Director</b> — (volné / dle serveru)</div>
+              <div><b style="color:var(--text)">Captain</b> — (velitel směny)</div>
+            </div>
+          </div>
+          <div style="padding:16px">
+            <div class="pill">Field</div>
+            <div style="margin-top:10px;color:var(--muted);line-height:1.9">
+              <div><b style="color:var(--text)">Lieutenant</b> — (zástupce velitele)</div>
+              <div><b style="color:var(--text)">Paramedic</b> — (výjezdy, ošetření)</div>
+              <div><b style="color:var(--text)">EMT</b> — (podpora, transport)</div>
+              <div><b style="color:var(--text)">Trainee</b> — (výcvik)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="recruitment">
+    <div class="container">
+      <div class="section-title">
+        <h2>Nábor</h2>
+        <div class="hint">Chceš do LSMS? Tady je jasný proces.</div>
+      </div>
+
+      <div class="split">
+        <div class="card">
+          <h3 style="margin-top:0">Požadavky</h3>
+          <ul class="list">
+            <li class="li">
+              <div class="check" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6 9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div><b>Aktivita</b><span>Docházka, spolehlivost a chuť dělat RP.</span></div>
+            </li>
+            <li class="li">
+              <div class="check" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6 9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div><b>Disciplína</b><span>Dodržování pravidel, respekt k ostatním složkám.</span></div>
+            </li>
+            <li class="li">
+              <div class="check" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6 9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div><b>Výcvik</b><span>Teorie + praxe + zkušební doba.</span></div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-color:rgba(225,29,72,.22)">
+          <h3 style="margin-top:0">Jak se přihlásit</h3>
+          <p style="color:var(--muted);line-height:1.6">
+            Pošli zprávu vedení LSMS a domluv si náborový pohovor.
+            V RP řešíme vše profesionálně: bez zbytečných OOC debat.
+          </p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
+            <a class="btn primary" href="#contact">Kontaktovat LSMS</a>
+            <a class="btn" href="#protocols">Podívat se na protokoly</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <div class="section-title">
+        <h2>Kontakt</h2>
+        <div class="hint">Doplň si sem Discord / server info – nebo to nech jak je.</div>
+      </div>
+
+      <div class="grid3">
+        <div class="card">
+          <div class="icon" aria-hidden="true">📞</div>
+          <h3>Dispatch</h3>
+          <p>Urgentní případy: <b>911</b> (požádej o EMS).</p>
+        </div>
+        <div class="card blue">
+          <div class="icon" aria-hidden="true">💬</div>
+          <h3>Discord</h3>
+          <p><span class="kbd">https://discord.gg/h6dcRCBJ</span>.</p>
+        </div>
+        <div class="card green">
+          <div class="icon" aria-hidden="true">📍</div>
+          <h3>Lokace</h3>
+          <p>Pillbox Hill Medical Center • Los Santos</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container" style="padding-bottom:10px">
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+      <div>
+        <div style="font-weight:900;letter-spacing:.2px"/div>
+        <div class="hint" style="margin-top:4px"></div>
+      </div>
+      <a class="btn primary" href="#top">Zpět nahoru</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="foot">
+      <div>© 2026 Los Santos Medical Service • Owner: <b style="color:var(--text)">Jacob Sanchez</b></div>
+      <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+        <a href="#about">O nás</a>
+        <a href="#services">Služby</a>
+        <a href="#recruitment">Nábor</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // If photo loads successfully, hide placeholder text
+  (function(){
+    const img = document.getElementById('yourPhoto');
+    const ph = document.getElementById('photoPlaceholder');
+    if(!img || !ph) return;
+    img.addEventListener('load', () => {
+      img.style.display = 'block';
+      ph.style.display = 'none';
+    });
+  })();
+</script>
+
+</body>
+</html>
